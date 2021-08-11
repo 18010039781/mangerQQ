@@ -1,0 +1,71 @@
+# go-cqhttp 默认配置文件
+
+account: # 账号相关
+  uin: 3058636784 # QQ账号（需要修改）
+  password: '密码' # 密码为空时使用扫码登录
+  encrypt: false  # 不需要修改
+  status: 0      # 不需要修改
+  relogin: # 不需要修改
+    delay: 3   # 不需要修改
+    interval: 3   # 不需要修改
+    max-times: 0  # 不需要修改
+  #不需要修改
+  use-sso-address: true
+
+heartbeat:
+#需要修改 修改成-1
+  interval: -1
+
+message:
+  # 不需要修改
+  post-format: string
+  # 不需要修改
+  ignore-invalid-cqcode: false
+  # 不需要修改
+  force-fragment: false
+  # 不需要修改
+  fix-url: false
+  # 不需要修改
+  proxy-rewrite: ''
+  # 不需要修改
+  report-self-message: false
+  # 不需要修改
+  remove-reply-at: false
+  # 不需要修改
+  extra-reply-data: false
+
+output:
+  # 不需要修改
+  log-level: warn
+  # 不需要修改
+  debug: false
+
+# 不需要修改
+default-middlewares: &default
+  # 不需要修改
+  access-token: ''
+  # 不需要修改
+  filter: ''
+  # 不需要修改
+  rate-limit:
+    enabled: false # 不需要修改
+    frequency: 1  # 不需要修改
+    bucket: 1     # 不需要修改
+
+database: # 不需要修改
+  leveldb:
+    # 不需要修改
+    enable: true
+
+servers:
+  - http:
+      # 需要修改
+      host: 127.0.0.1
+      # 需要修改
+      port: 5700
+      # 不需要修改
+      timeout: 5
+      middlewares:
+        <<: *default # 不需要修改
+      post:
+      - url: 'localhost/index.php' # 需要修改
