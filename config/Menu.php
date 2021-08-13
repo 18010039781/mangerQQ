@@ -18,12 +18,13 @@ return array(
     //检查禁言消息
     array('msg'=>'禁言消息提示','groupBool'=>false,'fun'=>'stopSpeak','className'=>'timerMsg'),
     //检查荣誉消息（龙王、群聊之火、快乐源泉）
-    array('msg'=>'荣誉消息提示','groupBool'=>false,'fun'=>'honorChange','className'=>'timerMsg'),
+    //array('msg'=>'荣誉消息提示','groupBool'=>false,'fun'=>'honorChange','className'=>'timerMsg'),
     //检查荣誉消息（龙王、群聊之火、快乐源泉）
     array('msg'=>'配套服务-不推荐关闭','groupBool'=>true,'fun'=>'relevance','className'=>'timerMsg'),
     array('msg'=>'多条查询','groupBool'=>true,'fun'=>'moreSearch','className'=>'timerMsg'),
 
     //正常的菜单
+    array('msg'=>'查询京东','groupBool'=>true,'fun'=>'searchJd','className'=>''),
     array('msg'=>'查询电话','groupBool'=>true,'fun'=>'searchPhone','className'=>''),
     array('msg'=>'查询信息','groupBool'=>true,'fun'=>'searchMe','className'=>''),
     array('msg'=>'点歌','groupBool'=>true,'fun'=>'musicWYU','className'=>''),
@@ -35,4 +36,6 @@ return array(
     array('msg'=>'群荣誉','groupBool'=>true,'fun'=>'showGroupTop','className'=>''),
     array('msg'=>'设置管理员','groupBool'=>true,'fun'=>'setGroupAdmin','className'=>''),
     array('msg'=>'撤回','groupBool'=>true,'fun'=>'','className'=>'deleteMsg'),
+    array('msg'=>'设置','groupBool'=>true,'fun'=>'settingArr','className'=>'setu'),
+    array('msg'=>'我有个朋友..说..','groupBool'=>true,'fun'=>'sayImages','className'=>'canvas'),
 );
