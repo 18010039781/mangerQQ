@@ -24,7 +24,7 @@ return array(
     array('msg'=>'多条查询','groupBool'=>true,'fun'=>'moreSearch','className'=>'timerMsg'),
 
     //正常的菜单
-    array('msg'=>'查询京东','groupBool'=>true,'fun'=>'searchJd','className'=>''),
+    //array('msg'=>'查询京东','groupBool'=>true,'fun'=>'searchJd','className'=>''),
     array('msg'=>'查询电话','groupBool'=>true,'fun'=>'searchPhone','className'=>''),
     array('msg'=>'查询信息','groupBool'=>true,'fun'=>'searchMe','className'=>''),
     array('msg'=>'点歌','groupBool'=>true,'fun'=>'musicWYU','className'=>''),
