@@ -28,7 +28,7 @@ class canvas
         $msg = $GLOBALS["msg"];
         preg_match('/^我(.*?)朋友(.*?)说(.*)$/',$msg,$matches);
         if(count($matches)==4){
-            $qqNumber = self::getQQNumber($matches[2]);
+            $qqNumber = self::getQQNumber();
             $this->roundNum = $qqNumber;
             //$qqUrl = "http://q.qlogo.cn/headimg_dl?dst_uin={$qqNumber}&spec=100&img_type=jpg";
             $qqUrl = "http://q.qlogo.cn/headimg_dl?dst_uin={$qqNumber}&spec=640&img_type=jpg";
@@ -53,11 +53,17 @@ class canvas
         $ccc = imagecolorallocate($this->img,0,0,0);
         $color2 = imagecolorallocate($this->img,98,102,117);
         $font2=realpath('./web/fonts/HYQingYunW.ttf');
-        imagettftext($this->img,38,0,$this->height+15,$this->height*0.4,$ccc,$font2,"朋友");
-        $width = $this->width-$this->height-30;
-        $top = $this->height*0.6-40;
-        $temp = array("color" => array(98, 102, 117),"fontsize" =>28,"width" => $width,"left" =>$this->height+22,"top" => $top,"hang_size" => 40);
+        $width = $this->width-$this->height-40;
+        $top = $this->height*0.6-60;
+        $temp = array("color" => array(98, 102, 117),"fontsize" =>40,"width" => $width,"left" =>$this->height+22,"top" => $top,"hang_size" => 60);
         //imagettftext($this->img,28,0,$this->height+10,$this->height*0.7,$color2,$font2,$text);
+        $box = imagettfbbox(58, 0, $font2, "朋友");
+        $pengHeight = $box[1]-$box[7];
+        $textHeight = self::draw_txt_to($this->img,$temp,$font2, $text, false);
+        $height = ($this->height-$textHeight-$pengHeight)/2;
+        //goHttp::send_group_msg("pengHeight:{$pengHeight},textHeight:{$textHeight},top:{$height},oldTop:{$top}");
+        imagettftext($this->img,58,0,$this->height+15,$height+$pengHeight,$ccc,$font2,"朋友");
+        $temp["top"] = $height+$pengHeight;
         self::draw_txt_to($this->img,$temp,$font2, $text, true);
         //die();
         //imagettftext($this->img,$font1,$this->height+60,$this->padding+20,"朋友",$ccc);
@@ -118,25 +124,19 @@ class canvas
         $GLOBALS["_echo"] = "[CQ:image,file=file:///$fileUrl,cache=0,proxy=0]";
     }
 
-    private function getQQNumber($str){
-        $str = trim($str);
-        if(empty($str)){
-            //没找到QQ
-            $number = self::randQQForGroup();
+    private function getQQNumber(){
+        preg_match('/\[CQ:at,qq=(.*?)\]/',$GLOBALS["msg"],$matches);
+        if(count($matches)==2){
+            //@群内某人
+            $number = $matches[1];
         }else{
-            preg_match('/^\[CQ:at,qq=(.*?)\]$/',trim($str),$matches);
-            if(count($matches)==2){
-                //@群内某人
+            preg_match('/@(\d+)/',$GLOBALS["msg"],$matches);
+            if(count($matches)==2&&is_numeric($matches[1])){
+                //@一串数字
                 $number = $matches[1];
             }else{
-                preg_match('/^@(.*)$/',trim($str),$matches);
-                if(count($matches)==2&&is_numeric($matches[1])){
-                    //@一串数字
-                    $number = $matches[1];
-                }else{
-                    //没找到QQ
-                    $number = self::randQQForGroup();
-                }
+                //没找到QQ
+                $number = self::randQQForGroup();
             }
         }
         return $number;
@@ -218,7 +218,7 @@ class canvas
 
         $font_color = imagecolorallocate($card, $pos["color"][0], $pos["color"][1], $pos["color"][2]);
         for ($i = 0; $i < mb_strlen($str,"UTF8"); $i++) {
-            if($tp>2){ //大于两行不显示
+            if($tp>1){ //大于两行不显示
                 break;
             }
             $box = imagettfbbox($fontsize, 0, $font_file, $temp_string);
