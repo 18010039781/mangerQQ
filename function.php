@@ -163,6 +163,63 @@ function searchPhone($row){
     }
 }
 
+//查询京东
+function searchJd($row){
+    $msg = key_exists("msg",$row)?$row["msg"]:"";
+    if(strpos($GLOBALS['msg'], $msg) === 0) {
+        $GLOBALS['msg'] = \model\goHttp::getGroupOnlyForName($GLOBALS['msg']);
+        $key_word = getSubstr($GLOBALS['msg'], $msg);
+        $name = empty($key_word)?$GLOBALS['qq']:$key_word;
+        $key_word = getFastNumber($name);
+        if (empty($key_word)&&strpos($GLOBALS['msg'], "name") === false) {
+            $GLOBALS["_echo"] = "没检查到QQ或者电话";
+        }else {
+            $urlDate = array(
+                "key" => $GLOBALS["API_KEY"],
+                'type' => "email",//phone,email,name
+                'req' => "{$key_word}@qq.com",
+            );
+            if(strpos($name, "phone") !== false){
+                $urlDate["type"] = "phone";
+                $urlDate["req"] = $key_word;
+            }elseif(strpos($name, "name") !== false){
+                $key_word = str_replace("name","",$name);
+                $urlDate["type"] = "name";
+                $urlDate["req"] = $key_word;
+            }
+            $str = curl_get("https://api88.net/api/jd/query?" . http_build_query($urlDate));
+            $str = str_replace("\\\\N","",$str);
+            $arr = json_decode($str, true);
+            if(key_exists("code",$arr)&&$arr["code"]==200){
+                $dataRow = key_exists("data",$arr)?$arr["data"]:array();
+                $returnData = array();
+                $list = array(
+                    array("value"=>"京东用户:","name"=>"name+nickname"),
+                    array("value"=>"邮箱:","name"=>"email"),
+                    array("value"=>"电话1:","name"=>"phone1"),
+                    array("value"=>"电话2:","name"=>"phone2"),
+                    array("value"=>"电话3:","name"=>"phone3"),
+                );
+                foreach ($dataRow["jddata"] as $key=>$item){
+                    if($key>3){
+                        break;
+                    }
+                    if(!empty($returnData)){
+                        $returnData[]="---------------";
+                    }
+                    addListForSearchList($list,$item,$returnData);
+                }
+                if(count($dataRow["jddata"])>4){
+                    $returnData[]="---------------\n"."共".count($dataRow["jddata"])."条，只显示4条";
+                }
+                $GLOBALS["_echo"] = implode("\n",$returnData);
+            }else{
+                $GLOBALS["_echo"] = "太干净了，没有京东信息 -v-!";
+            }
+        }
+    }
+}
+
 //文字转语音
 function textForTTs($row){
     $msg = key_exists("msg",$row)?$row["msg"]:"";
@@ -183,7 +240,7 @@ function textForTTs($row){
             $str = base64_encode($info);
             $file_name = downFileForCurl($info);
             //$GLOBALS["_echo"] = "[CQ:record,file=data:audio/mpeg;base64,$str]";
-            $GLOBALS["_echo"] = "[CQ:record,cache=0,proxy=0,file=data:audio/wav;base64,$str]";
+            //$GLOBALS["_echo"] = "[CQ:record,cache=0,proxy=0,file=data:audio/wav;base64,$str]";
             if($file_name==false){
                 $GLOBALS["_echo"] = "转换失败了 -。-！";
             }else{
@@ -565,13 +622,14 @@ function myAutoload($name)
     return false;
 }
 
-function downloadImageFromUrl($url, $path = "./images/") {
+function downloadImageFromUrl($url, $path = "./images/",$name="") {
     // 因为不知道最后接受到的文件是什么格式，先建立一个临时文件，用于保存
     $tmpFile = tempnam(sys_get_temp_dir(), 'image');
     # 文件下载 BEGIN #
     // 执行curl
     $output = curl_get($url);
     if(empty($output)){
+        @unlink($tmpFile);
         return "";
     }
     // 打开临时文件，用于写入（w),b二进制文件
@@ -580,19 +638,17 @@ function downloadImageFromUrl($url, $path = "./images/") {
     // 关闭文件
     fclose($resource);
     # 文件下载 END #
-    // 获取文件类型
-    if (function_exists('exif_imagetype')) {
-        // 读取一个图像的第一个字节并检查其签名(这里需要打开mbstring及php_exif)
-        $fileType = exif_imagetype($tmpFile);
-    } else {
-        // 获取文件大小，里面第二个参数是文件类型 （这里后缀可以直接通过getimagesize($url)来获取，但是很慢）
-        $fileInfo = getimagesize($tmpFile);
-        $fileType = $fileInfo[2];
+    // 获取文件大小，里面第二个参数是文件类型 （这里后缀可以直接通过getimagesize($url)来获取，但是很慢）
+    $fileInfo = getimagesize($tmpFile);
+    if($fileInfo[0]<=40){//图像宽度小于40px
+        @unlink($tmpFile);
+        return "";
     }
+    $fileType = $fileInfo[2];
     // 根据文件类型获取后缀名
     $extension = image_type_to_extension($fileType);
     // 计算指定文件的 MD5 散列值，作为保存的文件名，重复下载同一个文件不会产生重复保存，相同的文件散列值相同
-    $md5FileName = md5_file($tmpFile);
+    $md5FileName = empty($name)?md5_file($tmpFile):$name;
     // 最终保存的文件
     $returnFile = $path . $md5FileName . $extension;
     // 检查传过来的路径是否存在，不存在就创建
