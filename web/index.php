@@ -2,8 +2,8 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <meta content="always" name="referrer">
     <meta name="theme-color" content="#2932e1">
+    <meta name="referrer" content="never">
     <title>web</title>
     <link rel="stylesheet" type="text/css" href="./web/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="./web/css/main.css">
@@ -35,7 +35,8 @@
                                 <span> 或者 </span>
                             </div>
                             <div style="width: 40%" class="media-middle">
-                                <input type="file" class="form-control" id="sendFile">
+                                <input type="file" class="form-control" id="changeFile" accept="image/x-png,image/gif,image/jpeg">
+                                <input type="hidden" id="sendFile">
                             </div>
                             <div style="width: 12%;padding-left: 10px;" class="media-middle text-left">
                                 <button class="btn btn-primary" id="sendMsg">发送</button>
@@ -85,7 +86,7 @@
     <div class="col-lg-5 mb-20">
         <ul class="list-group" id="QQMsgUl">
             <li class="list-group-item title-li">
-                <h4>最近的QQ消息：</h4>
+                <h4>最近的QQ消息：<small>（消息有30秒的延迟）</small></h4>
             </li>
         </ul>
     </div>

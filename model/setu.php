@@ -15,13 +15,27 @@ class setu{
     private $keyWord="";
     private $code="+";
 
-    private $notList=array("色图");
+    private $setuLink=array(
+        array("file"=>"zhen","url"=>"https://cdn.seovx.com/?mom=302","expr"=>"美图"),
+        array("file"=>"yuan","url"=>"https://cdn.seovx.com/d/?mom=302","expr"=>"二刺螈|二次元"),
+        array("file"=>"zhen","url"=>"http://api.nmb.show/xiaojiejie1.php","expr"=>"真人|妹子|女人"),
+        array("file"=>"zhen","url"=>"http://api.nmb.show/xiaojiejie2.php","expr"=>"美女|富婆"),
+        //array("fuc"=>"zhen","url"=>"https://cdn.seovx.com/?mom=302","expr"=>"真人|美女"),
+    );
 
     public function __construct($row=array()){
         $this->row = $row;
         $msg = key_exists("msg",$row)?$row["msg"]:"";
         if(!empty($msg)&&strpos($GLOBALS['msg'], $msg) === 0){
             $this->keyWord = getSubstr($GLOBALS['msg'], $msg);
+            //添加接口
+            $url = "https://api88.net/api/img/rand/?";
+            $urlDate = array(
+                "key"=>$GLOBALS['API_KEY'],
+                "rand_type"=>"rand_mt" //rand_mz,rand_mt (妹子图，唯美图)
+            );
+            $url.=http_build_query($urlDate);
+            $this->setuLink[]=array("file"=>"zhen","url"=>$url,"expr"=>"小清新|清新|女神");
         }
     }
 
@@ -35,27 +49,32 @@ class setu{
         }
     }
 
-    private function validateStr(){
-        $str = "v1";
-        if(strpos($this->keyWord, "真人") === 0||strpos($this->keyWord, "唯美") === 0){
-            $str="api88";
+    private function getUrlAndData(){
+        foreach ($this->setuLink as $row){
+            $key_word = str_replace($this->code,'',$this->keyWord);
+            if(!empty($key_word)&&strstr($row["expr"],$key_word)!==false){
+                //有地址
+                $this->foreachImages($row);
+                return;
+            }
         }
-        return $str;
+        $this->imagesForV2();
     }
 
-    private function getUrlAndData($str=""){
-        if(empty($str)){
-            $str = $this->validateStr();
+    private function foreachImages($row,$num=2){
+        $fileUrl = downloadImageFromUrl($row["url"],"./images/{$row['file']}/");
+        if(!empty($fileUrl)){
+            $fileUrl = realpath($fileUrl);
+            $echo = "[CQ:image,file=file:///$fileUrl,cache=0,proxy=0]";
+            if($num==1){
+                $GLOBALS["_echo"] = $echo;
+            }else{
+                goHttp::send_group_msg($echo);
+            }
         }
-        switch ($str){
-            case "v2":
-                $this->imagesForV2();
-                break;
-            case "v1":
-                $this->imagesForV1();
-                break;
-            default:
-                $this->imagesForApi88();
+        $num--;
+        if($num>0){
+            $this->foreachImages($row,$num);
         }
     }
 
@@ -129,7 +148,11 @@ class setu{
                         $data = $data["data"];
                         foreach ($data as $item){
                             $imageUrl = key_exists("url",$item)?$item['url']:current($item['urls']);
-                            $GLOBALS["_echo"] = "[CQ:image,file=$imageUrl,cache=0,proxy=0]";
+                            $imageUrl = downloadImageFromUrl($imageUrl,"./images/setu/");
+                            $fileUrl = realpath($imageUrl);
+                            if(!empty($fileUrl)){
+                                $GLOBALS["_echo"] = "[CQ:image,file=file:///$fileUrl,cache=0,proxy=0]";
+                            }
                             //[CQ:image,file=http://baidu.com/1.jpg,type=show,id=40004]
                             sendAllMsg();
                             $GLOBALS["_echo"] = "";
@@ -230,6 +253,7 @@ class setu{
         }
         $list["的"]="";
         $list["色图"]="";
+        $list["涩图"]="";
         return $list;
     }
 }

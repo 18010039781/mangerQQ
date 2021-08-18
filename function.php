@@ -655,12 +655,39 @@ function downloadImageFromUrl($url, $path = "./images/",$name="") {
     if (!is_dir($path)) {
         mkdir($path, 0777, true);
     }
+    //縮小圖片
+    $img = resizeImage($tmpFile);
+    //圖片保存為jpg
+    imagejpeg($img,$returnFile,100);
+    // 释放内存
+    imagedestroy($img);
     // 复制临时文件到最终保存的文件中
-    copy($tmpFile, $returnFile);
+    //copy($tmpFile, $returnFile);
     // 释放临时文件
     @unlink($tmpFile);
     // 返回保存的文件路径
     return $returnFile;
+}
+
+//縮放圖片
+function resizeImage($fileUrl,$width=900){
+    $fileInfo = getimagesize($fileUrl);
+    $fileType = $fileInfo[2];
+    $newWidth = $fileInfo[0];
+    $newHeight= $fileInfo[1];
+    // 根据文件类型获取后缀名
+    $extension = image_type_to_extension($fileType);
+    $extension = str_replace(".","",$extension);
+    if($fileInfo[0]>$width){ //寬度最大900
+        $newWidth = $width;
+        $newHeight = ($fileInfo[1]/$fileInfo[0])*$width;
+    }
+    $newImg = imagecreatetruecolor($newWidth,$newHeight);
+    $fun = "imagecreatefrom".$extension;
+    $source = $fun($fileUrl);
+    imagecopyresampled($newImg, $source, 0, 0, 0, 0, $newWidth,$newHeight, $fileInfo[0], $fileInfo[1]);
+    imagedestroy($source);
+    return $newImg;
 }
 
 /*
@@ -681,6 +708,8 @@ function curl_get($url)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     //curl_setopt($ch, CURLOPT_REFERER, $refer);
+    //curl_setopt($ch, CURLOPT_MAXREDIRS,5);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 20);
     $output = curl_exec($ch);
     curl_close($ch);

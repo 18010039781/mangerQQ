@@ -30,18 +30,15 @@ class canvas
         if(count($matches)==4){
             $qqNumber = self::getQQNumber();
             $this->roundNum = $qqNumber;
-            //$qqUrl = "http://q.qlogo.cn/headimg_dl?dst_uin={$qqNumber}&spec=100&img_type=jpg";
             $qqUrl = "http://q.qlogo.cn/headimg_dl?dst_uin={$qqNumber}&spec=640&img_type=jpg";
-            if(!is_dir("./images/photoHead")){
-                mkdir ("./images/photoHead",0777,true);
-            }
             $qqUrl = downloadImageFromUrl($qqUrl,"./images/photoHead/",$qqNumber);
             if(empty($qqUrl)){ //没有高清图像
-                $qqUrl = "http://q.qlogo.cn/headimg_dl?dst_uin={$qqNumber}&spec=100&img_type=jpg";
+                $qqUrl = "http://q1.qlogo.cn/g?b=qq&nk={$qqNumber}&s=160";
                 $qqUrl = downloadImageFromUrl($qqUrl,"./images/photoHead/",$qqNumber);
             }
             //写入朋友头像
             self::createImgFoSay($qqUrl);
+            unlink($qqUrl);//删除QQ头像
             //写入朋友说的话
             self::sayContract($matches[3]);
             self::printImg();
@@ -116,7 +113,7 @@ class canvas
     private function printImg(){
         //header('Content-Type: image/jpeg');
         // 输出图像
-        $fileUrl = "./images/{$this->roundNum}.jpeg";
+        $fileUrl = "./images/photoHead/{$this->roundNum}.jpeg";
         imagejpeg($this->img,$fileUrl,100);
         // 释放内存
         imagedestroy($this->img);

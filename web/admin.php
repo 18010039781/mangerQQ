@@ -54,15 +54,19 @@ switch ($fun){
             $con = getLatestLines($fileUrl,10);
             $data = explode("\r\n",$con);
             $html = "";
-            foreach ($data as $itemStr){
+            for ($i=count($data)-1;$i>=0;$i--){ //倒着显示
+                $itemStr = $data[$i];
                 if(!empty($itemStr)){
                     $itemRow = json_decode($itemStr,true);
-                    if(!empty($itemRow["time"])&&$itemRow["time"]>=$statTime){
+                    if(!empty($itemRow["time"])&&$itemRow["time"]>=$statTime&&$itemRow["time"]<$time){
                         $html.="<li class='list-group-item'>";
+                        //$itemRow["message"].=" <br/>startTime:".date("Y-m-d H:i:s",$statTime);
                         $html.=getMsgForJson($itemRow);
                         $html.="</li>";
                     }
                 }
+            }
+            foreach ($data as $itemStr){
             }
             echo json_encode(array("status"=>200,"html"=>$html));
         }else{
@@ -147,10 +151,19 @@ function getMsgForJson($dataJson){
             $html.="<p class='text-center'><d>群名片</d>：{$dataJson['sender']['card']}</p>";
             $html.="<p class='text-right'><d>发信人QQ</d>：{$dataJson['sender']['user_id']}</p>";
             $html.="</div>";
-            $html.="<p><d>消息</d>：{$dataJson['message']}</p>";
+            $html.="<p><d>消息</d>：".translationMessage($dataJson['message'])."</p>";
         }else{
             $html.="<p class='text-allwork'><d>消息json</d>：".json_encode($dataJson)."</p>";
         }
     }
     return $html;
+}
+
+function translationMessage($str){
+    $message = "";
+    preg_match('/^(.*)\[CQ:image,file=(.*?),url=(.*?)\](.*)$/',$str,$matches);
+    if(is_array($matches)&&count($matches)==5){
+        $message.=$matches[1]."<img src='{$matches[3]}'/>".$matches[4];
+    }
+    return empty($message)?$str:$message;
 }

@@ -55,6 +55,20 @@ $(function ($) {
         var group_id = $(this).data("id");
         sendMsg(group_id);
     });
+
+    $("#changeFile").on("change",function () {
+        var fileList = $(this).get(0).files[0];
+        if(fileList["type"] == "image/gif"||fileList["type"] == "image/png"||fileList["type"] == "image/jpg"||fileList["type"] == "image/jpeg"){
+            var reader = new FileReader();
+            reader.readAsDataURL(fileList);
+            reader.onload = function(e){
+                $("#sendFile").val(e.target.result);
+            };
+        }else{
+            $(this).val("");
+            hindDiv("文件类型必须是png、jpg、jpeg格式");
+        }
+    });
 });
 
 function sendMsg(groupId) {
@@ -64,30 +78,22 @@ function sendMsg(groupId) {
     if(text==""&&file==""){
         hindDiv("请输入文字或者选择文件");
     }else{
-        var fileList = $("#sendFile").get(0).files[0];
         $("#sendText").val("");
         $("#sendFile").val("");
+        $("#changeFile").val("");
         $("#myModal").modal("hide");
-        if(fileList["type"] == "image/gif"||fileList["type"] == "image/png"||fileList["type"] == "image/jpg"||fileList["type"] == "image/jpeg"){
-            var reader = new FileReader();
-            reader.readAsDataURL(fileList);
-            reader.onload = function(e){
-                var data = {
-                    "group_id":group_id,
-                    "text":text,
-                    "file":e.target.result
-                }
-                $.post("./web/admin.php?fun=sendMsg",data, function(json){
-                    if(json['status']==200){
-                        hindDiv("消息已发送");
-                    }else{
-                        hindDiv(json['error']);
-                    }
-                },"json");
-            };
-        }else{
-            hindDiv("文件类型必须是png、jpg、jpeg格式");
-        }
+        var data = {
+            "group_id":group_id,
+            "text":text,
+            "file":file
+        };
+        $.post("./web/admin.php?fun=sendMsg",data, function(json){
+            if(json['status']==200){
+                hindDiv("消息已发送");
+            }else{
+                hindDiv(json['error']);
+            }
+        },"json");
     }
 }
 
@@ -120,7 +126,7 @@ Timer = "";
 function hindDiv(str) {
     clearTimeout(Timer);
     var html = '<div class="hind-top" id="hindTitle">';
-    html+='<div class="text-center text-success">'+str+'</div>';
+    html+='<div class="text-center">'+str+'</div>';
     html+='</div>';
     if($("#hindTitle").length==1){
         $("#hindTitle>div").text(str);

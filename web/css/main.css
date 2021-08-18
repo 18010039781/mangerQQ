@@ -44,11 +44,12 @@
     padding: 10px 15px 10px 30px;background-color: #f5f5f5;border-top: 1px solid #ddd;  }
 
 .hind-top{ position: fixed;top:0px;left: 0px;width: 100%;z-index: 999;padding: 20px;
-    background: #f5f5f5;font-size: 20px;display: none;
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
-    -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
-    -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
-    -o-box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);}
+    background: #337ab7;font-size: 20px;display: none;
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,.1);
+    -webkit-box-shadow: 0 5px 5px 0 rgba(0,0,0,.1);
+    -moz-box-shadow: 0 5px 5px 0 rgba(0,0,0,.1);
+    -o-box-shadow: 0 5px 5px 0 rgba(0,0,0,.1);}
+.hind-top>.text-center{color: #fff;}
 
 .div-tab{ display: table;width: 100%;}
 .div-tab>*{ display: table-cell;}
