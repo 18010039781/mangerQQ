@@ -86,7 +86,7 @@
     <div class="col-lg-5 mb-20">
         <ul class="list-group" id="QQMsgUl">
             <li class="list-group-item title-li">
-                <h4>最近的QQ消息：<small>（消息有30秒的延迟）</small></h4>
+                <h4>最近的QQ消息：<small>（消息有5秒的延迟）</small></h4>
             </li>
         </ul>
     </div>

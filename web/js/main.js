@@ -37,7 +37,7 @@ $(function ($) {
         ajaxAutoGroup(groupId);
     });
 
-    setInterval(ajaxMsgTimer,1000*10);
+    setInterval(ajaxMsgTimer,1000*5);
     ajaxMsgTimer();
 
 
@@ -98,7 +98,14 @@ function sendMsg(groupId) {
 }
 
 function ajaxMsgTimer() {
-    $.getJSON("./web/admin.php",{"fun":"ajaxMsg"}, function(json){
+    var dataTime = $("#QQMsgUl>.list-group-item").eq(1);
+    var data = {
+        "fun":"ajaxMsg"
+    };
+    if(dataTime.length==1){
+        data["time"] = dataTime.data("time");
+    }
+    $.getJSON("./web/admin.php",data, function(json){
         if(json['status']==200){
             $("#QQMsgUl>.title-li").after(json["html"]);
         }else{

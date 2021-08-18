@@ -49,8 +49,7 @@ switch ($fun){
     case "ajaxMsg"://获取最近的qq消息
         $fileUrl ="../log/all_qq.log";
         if(file_exists($fileUrl)){
-            $time = time();
-            $statTime = $time-10;
+            $time=key_exists("time",$_GET)?$_GET["time"]:time();// 0：取消
             $con = getLatestLines($fileUrl,10);
             $data = explode("\r\n",$con);
             $html = "";
@@ -58,8 +57,8 @@ switch ($fun){
                 $itemStr = $data[$i];
                 if(!empty($itemStr)){
                     $itemRow = json_decode($itemStr,true);
-                    if(!empty($itemRow["time"])&&$itemRow["time"]>=$statTime&&$itemRow["time"]<$time){
-                        $html.="<li class='list-group-item'>";
+                    if(!empty($itemRow["time"])&&$itemRow["time"]>$time){
+                        $html.="<li class='list-group-item' data-time='{$itemRow['time']}'>";
                         //$itemRow["message"].=" <br/>startTime:".date("Y-m-d H:i:s",$statTime);
                         $html.=getMsgForJson($itemRow);
                         $html.="</li>";
